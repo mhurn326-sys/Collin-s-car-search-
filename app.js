@@ -15,6 +15,7 @@ const MODELS = [
     cb: "honda-prelude",       // Cars & Bids slug
     yearMin: 1997,
     yearMax: 2001,
+    manualBadge: "5-speed manual all years (Type SH was manual-only)",
   },
   {
     id: "240sx",
@@ -29,6 +30,7 @@ const MODELS = [
     cb: "nissan-240sx",
     yearMin: 1996,
     yearMax: 1998,
+    manualBadge: "5-speed manual all years",
   },
   {
     id: "is300",
@@ -43,10 +45,20 @@ const MODELS = [
     cb: "lexus-is300",
     yearMin: 2001,
     yearMax: 2005,
+    // 5-speed manual wasn't offered until 2002 (US launch in 2001 was automatic-only).
+    manualYearMin: 2002,
+    manualBadge: "manual only 2002–2005 (2001 was auto-only)",
   },
 ];
 
 const enc = encodeURIComponent;
+
+// Effective year range for a model: tighten to manual-only years when filtering for manuals.
+function yearRange(m, f) {
+  const min = f.manualOnly && m.manualYearMin ? m.manualYearMin : m.yearMin;
+  const max = f.manualOnly && m.manualYearMax ? m.manualYearMax : m.yearMax;
+  return { min, max };
+}
 
 // Marketplace link builders. Each returns a ready-to-open URL for one model + filters.
 const SITES = [
@@ -58,8 +70,9 @@ const SITES = [
     build: (m, f) => {
       const p = new URLSearchParams({ make: m.make, model: m.atModel });
       if (f.manualOnly) p.set("transmission", "manual");
-      if (m.yearMin) p.set("minyear", m.yearMin);
-      if (m.yearMax) p.set("maxyear", m.yearMax);
+      const ay = yearRange(m, f);
+      if (ay.min) p.set("minyear", ay.min);
+      if (ay.max) p.set("maxyear", ay.max);
       if (f.maxPrice) p.set("maxprice", f.maxPrice);
       if (f.zip) p.set("zip", f.zip);
       if (f.radius && f.radius !== "0") p.set("radius", f.radius);
@@ -76,8 +89,9 @@ const SITES = [
       p.append("makes[]", m.make);
       p.append("models[]", m.carsModel);
       if (f.manualOnly) p.append("transmission_slugs[]", "manual");
-      if (m.yearMin) p.set("year_min", m.yearMin);
-      if (m.yearMax) p.set("year_max", m.yearMax);
+      const cy = yearRange(m, f);
+      if (cy.min) p.set("year_min", cy.min);
+      if (cy.max) p.set("year_max", cy.max);
       if (f.maxPrice) p.set("maximum_price", f.maxPrice);
       p.set("maximum_distance", f.radius && f.radius !== "0" ? f.radius : "all");
       if (f.zip) p.set("zip", f.zip);
@@ -91,8 +105,9 @@ const SITES = [
     build: (m, f) => {
       const p = new URLSearchParams();
       if (f.manualOnly) p.set("transmissionCodes", "MAN");
-      if (m.yearMin) p.set("startYear", m.yearMin);
-      if (m.yearMax) p.set("endYear", m.yearMax);
+      const ty = yearRange(m, f);
+      if (ty.min) p.set("startYear", ty.min);
+      if (ty.max) p.set("endYear", ty.max);
       if (f.maxPrice) p.set("maxPrice", f.maxPrice);
       if (f.zip) p.set("zip", f.zip);
       p.set("searchRadius", f.radius || "0"); // 0 = nationwide
@@ -184,7 +199,8 @@ function renderModels() {
       <span class="tick">✓</span>
       <span class="emoji">${m.emoji}</span>
       <span class="name">${m.name}</span>
-      <span class="sub">${m.sub}</span>`;
+      <span class="sub">${m.sub}</span>
+      ${m.manualBadge ? `<span class="badge">⚙️ ${m.manualBadge}</span>` : ""}`;
     card.addEventListener("click", () => {
       selected.has(m.id) ? selected.delete(m.id) : selected.add(m.id);
       card.classList.toggle("selected", selected.has(m.id));
@@ -213,9 +229,9 @@ function renderResults() {
 
     const head = document.createElement("div");
     head.className = "result-head";
-    head.innerHTML = `<span class="title"><span class="emoji">${m.emoji}</span>${m.name}${
-      f.manualOnly ? " — manual" : ""
-    }</span>`;
+    const ry = yearRange(m, f);
+    head.innerHTML = `<span class="title"><span class="emoji">${m.emoji}</span>${m.name}
+      <span class="muted small">${ry.min}–${ry.max}${f.manualOnly ? " · manual" : ""}</span></span>`;
 
     const openAll = document.createElement("button");
     openAll.className = "btn";
