@@ -1,8 +1,12 @@
 # 🏁 Manual Hunter
 
-A web app for finding **manual-transmission** enthusiast cars nationwide — built for the hunt for a
-**Honda Prelude**, **Nissan 240SX**, **Lexus IS300**, or **Nissan 300ZX** (the "IS 300z" you mentioned
-could mean either the Lexus IS300 or the Nissan 300ZX, so both are included).
+A web app for finding **manual-transmission** enthusiast cars nationwide — built for the hunt for a:
+
+- **1997–2001 Honda Prelude** (5th gen)
+- **1996–1998 Nissan 240SX** (S14)
+- **2001–2005 Lexus IS300** (1st gen)
+
+Each car's year range is baked in and applied automatically on the marketplaces that support it.
 
 ## What it does
 

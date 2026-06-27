@@ -6,49 +6,43 @@ const MODELS = [
     id: "prelude",
     emoji: "🚗",
     name: "Honda Prelude",
-    sub: "Honda • sport coupe",
+    sub: "Honda • 5th gen (1997–2001)",
     q: "honda prelude",
     make: "honda",
     atModel: "prelude",        // AutoTrader / AutoTempest model slug
     carsModel: "honda-prelude", // Cars.com model slug
     bat: "honda/prelude",      // Bring a Trailer path
     cb: "honda-prelude",       // Cars & Bids slug
+    yearMin: 1997,
+    yearMax: 2001,
   },
   {
     id: "240sx",
     emoji: "🏎️",
     name: "Nissan 240SX",
-    sub: "Nissan • S13/S14 drift icon",
+    sub: "Nissan • S14 (1996–1998)",
     q: "nissan 240sx",
     make: "nissan",
     atModel: "240sx",
     carsModel: "nissan-240sx",
     bat: "nissan/240sx",
     cb: "nissan-240sx",
+    yearMin: 1996,
+    yearMax: 1998,
   },
   {
     id: "is300",
     emoji: "🚘",
     name: "Lexus IS300",
-    sub: "Lexus • the manual 'IS 300z'",
+    sub: "Lexus • 1st gen (2001–2005)",
     q: "lexus is300",
     make: "lexus",
     atModel: "is-300",
     carsModel: "lexus-is_300",
     bat: "lexus/is300",
     cb: "lexus-is300",
-  },
-  {
-    id: "300zx",
-    emoji: "🐉",
-    name: "Nissan 300ZX",
-    sub: "Nissan • Z32 (other 'IS 300z' reading)",
-    q: "nissan 300zx",
-    make: "nissan",
-    atModel: "300zx",
-    carsModel: "nissan-300zx",
-    bat: "nissan/300zx",
-    cb: "nissan-300zx",
+    yearMin: 2001,
+    yearMax: 2005,
   },
 ];
 
@@ -64,6 +58,8 @@ const SITES = [
     build: (m, f) => {
       const p = new URLSearchParams({ make: m.make, model: m.atModel });
       if (f.manualOnly) p.set("transmission", "manual");
+      if (m.yearMin) p.set("minyear", m.yearMin);
+      if (m.yearMax) p.set("maxyear", m.yearMax);
       if (f.maxPrice) p.set("maxprice", f.maxPrice);
       if (f.zip) p.set("zip", f.zip);
       if (f.radius && f.radius !== "0") p.set("radius", f.radius);
@@ -80,6 +76,8 @@ const SITES = [
       p.append("makes[]", m.make);
       p.append("models[]", m.carsModel);
       if (f.manualOnly) p.append("transmission_slugs[]", "manual");
+      if (m.yearMin) p.set("year_min", m.yearMin);
+      if (m.yearMax) p.set("year_max", m.yearMax);
       if (f.maxPrice) p.set("maximum_price", f.maxPrice);
       p.set("maximum_distance", f.radius && f.radius !== "0" ? f.radius : "all");
       if (f.zip) p.set("zip", f.zip);
@@ -93,6 +91,8 @@ const SITES = [
     build: (m, f) => {
       const p = new URLSearchParams();
       if (f.manualOnly) p.set("transmissionCodes", "MAN");
+      if (m.yearMin) p.set("startYear", m.yearMin);
+      if (m.yearMax) p.set("endYear", m.yearMax);
       if (f.maxPrice) p.set("maxPrice", f.maxPrice);
       if (f.zip) p.set("zip", f.zip);
       p.set("searchRadius", f.radius || "0"); // 0 = nationwide
